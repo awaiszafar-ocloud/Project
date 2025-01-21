@@ -1,0 +1,16 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install Dependencies
+RUN npm install
+
+
+# Copy Source Code
+COPY . .
+
+# Start Server
+CMD [ "npm", "run", "dev" ]
