@@ -1,0 +1,18 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy Files
+COPY package*.json ./
+COPY prisma/schema.prisma ./prisma/
+
+
+# Install Dev Dependencies
+RUN npm Install
+RUN npx prisma generate
+
+
+# Copy Source Code
+COPY . .
+
+CMD [ "npm", "run", "dev" ]
