@@ -17,10 +17,12 @@ services:
         build:
             context: ./backend
             dockerfile: Dockerfile.prod
+            args:
+                - DATABASE_URL=postgresql://awais:Awais12345@postgres-prod:5432/proddb
 
         environment:
             -   NODE_ENV=production
-            -   DATABASE_URL=postgres://awais:Awais12345@postgres-prod:5432/proddb
+            -   DATABASE_URL=postgresql://awais:Awais12345@postgres-prod:5432/proddb
 
         depends_on:
             postgres-prod:
@@ -31,6 +33,7 @@ services:
 
     postgres-prod:
         image: postgres:15
+        container_name: postgres-prod
         healthcheck:
             test: ["CMD-SHELL", "pg_isready -U awais -d proddb"]
             interval: 10s

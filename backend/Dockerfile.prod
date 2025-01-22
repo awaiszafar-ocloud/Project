@@ -1,24 +1,29 @@
+# Stage 1: Build
 FROM node:18-alpine AS builder
 
-# Install openssl for builder stage
-RUN apk add --no-cache openssl
+# Install build dependencies including OpenSSL
+RUN apk add --no-cache openssl python3 make g++
 
 WORKDIR /app
 COPY . .
-RUN npm ci && npm run build
+RUN npm ci
+RUN npm run build
 
+# Stage 2: Run
 FROM node:18-alpine
 
-# Install openssl for production stage
-RUN apk add --no-cache openssl
+# Install runtime dependencies
+RUN apk add --no-cache openssl libc6-compat
 
 WORKDIR /app
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/tsconfig*.json ./
 
+# Generate Prisma client
 RUN npx prisma generate
-RUN npm run db:migrate
 
-CMD ["node", "dist/index.js"]
+# Run migrations and start server
+CMD ["sh", "-c", "npm run db:migrate && node dist/index.js"]
