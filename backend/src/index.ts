@@ -1,6 +1,17 @@
 import express from 'express';
+import cors from 'cors';
+
 const app = express();
 const PORT = 3000;
+
+const corsOptions = {
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
+
 
 app.get("/", (req, res) => {
     return res.status(200).json({message: "Server is running"})
@@ -9,6 +20,10 @@ app.get("/", (req, res) => {
 app.get('/api', (req, res) => {
   return res.json({ message: 'Hello from Express!' });
 });
+
+app.get("/api/health", (req, res) => {
+  return res.status(200).json({message: "Service is up and running"})
+})
 
 const server = app.listen(PORT, '0.0.0.0', () => { // <-- Add 0.0.0.0
   console.log(`Server running on http://0.0.0.0:${PORT}`);

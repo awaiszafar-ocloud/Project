@@ -12,7 +12,3 @@ frontend/node_modules/
 backend/dist/
 backend/node_modules/
 backend/prisma/migrations/
-
-# Docker
-docker-compose.*.yml
-**/.dockerignore
