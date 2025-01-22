@@ -1,18 +1,24 @@
 FROM node:18-alpine AS builder
-WORKDIR /app
 
+# Install openssl for builder stage
+RUN apk add --no-cache openssl
+
+WORKDIR /app
 COPY . .
 RUN npm ci && npm run build
 
-
 FROM node:18-alpine
-WORKDIR /app
 
+# Install openssl for production stage
+RUN apk add --no-cache openssl
+
+WORKDIR /app
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/prisma ./prisma
 
 RUN npx prisma generate
+RUN npm run db:migrate
 
-CMD [ "node", "dist/index.js" ]
+CMD ["node", "dist/index.js"]

@@ -1,18 +1,19 @@
 FROM node:18-alpine
 
+# Install essential dependencies
+RUN apk add --no-cache openssl python3 make g++ postgresql-client
+
 WORKDIR /app
 
-# Copy Files
+# Copy dependency files first
 COPY package*.json ./
 COPY prisma/schema.prisma ./prisma/
 
+# Install dependencies
+RUN npm install && npx prisma generate
 
-# Install Dev Dependencies
-RUN npm Install
-RUN npx prisma generate
-
-
-# Copy Source Code
+# Copy source code
 COPY . .
 
-CMD [ "npm", "run", "dev" ]
+# Wait for Postgres + run migrations + start server
+CMD ["sh", "-c", "until PGPASSWORD=Awais12345 pg_isready -h postgres-dev -p 5432 -U awais -d devdb; do sleep 2; echo 'Waiting for Postgres...'; done && npx prisma migrate deploy && npm run dev"]

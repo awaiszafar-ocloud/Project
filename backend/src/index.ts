@@ -10,8 +10,8 @@ app.get('/api', (req, res) => {
   return res.json({ message: 'Hello from Express!' });
 });
 
-const server = app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+const server = app.listen(PORT, '0.0.0.0', () => { // <-- Add 0.0.0.0
+  console.log(`Server running on http://0.0.0.0:${PORT}`);
 });
 
 // Graceful shutdown logic
