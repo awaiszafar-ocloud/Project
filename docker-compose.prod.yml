@@ -56,9 +56,9 @@ services:
   redis-prod:
     container_name: redis-prod
     image: redis:7
-    command: redis-server --requirepass your_secure_password_here
+    command: redis-server --requirepass Awais12345
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "your_secure_password_here", "ping"]
+      test: ["CMD", "redis-cli", "-a", "Awais12345", "ping"]
       interval: 5s
       timeout: 5s
       retries: 5
