@@ -10,7 +10,7 @@ interface Quote {
 function QuotePage() {
   const [quote, setQuote] = useState<Quote | null>(null);
   const [loading, setLoading] = useState(true);
-  const [countdown, setCountdown] = useState(10);
+  const [countdown, setCountdown] = useState(20);
 
   const fetchQuote = async () => {
     setLoading(true);
@@ -21,7 +21,7 @@ function QuotePage() {
       console.error('Error fetching quote:', error);
     } finally {
       setLoading(false);
-      setCountdown(10);
+      setCountdown(20);
     }
   };
 
@@ -34,7 +34,7 @@ function QuotePage() {
       setCountdown((prev) => {
         if (prev <= 1) {
           fetchQuote();
-          return 10;
+          return 20;
         }
         return prev - 1;
       });
