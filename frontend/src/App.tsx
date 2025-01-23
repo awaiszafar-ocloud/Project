@@ -5,6 +5,7 @@ import QuotePage from './pages/QuotePage';
 import HealthCheckPage from './pages/HealthCheckPage';
 
 function App() {
+  
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white">

@@ -1,56 +1,76 @@
 version: '3.8'
 
-
 services:
-    frontend:
-        build:
-            context: ./frontend
-            dockerfile: Dockerfile.prod
-        
-        ports:
-            -   "80:80"
+  frontend:
+    image: frontend-prod
+    container_name: frontend-prod
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    ports:
+      - "80:80"
+    networks:
+      - prod-network
 
-    backend:
-        init: true
-        stop_grace_period: 10s
-        
-        build:
-            context: ./backend
-            dockerfile: Dockerfile.prod
-            args:
-                - DATABASE_URL=postgresql://awais:Awais12345@postgres-prod:5432/proddb
+  backend:
+    image: backend-prod
+    container_name: backend-prod
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+      args:
+        - DATABASE_URL=postgresql://awais:Awais12345@postgres-prod:5432/proddb
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://awais:Awais12345@postgres-prod:5432/proddb
+      - REDIS_HOST=redis-prod
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=your_secure_password_here
+    depends_on:
+      postgres-prod:
+        condition: service_healthy
+      redis-prod:
+        condition: service_healthy
+    networks:
+      - prod-network
 
-        environment:
-            -   NODE_ENV=production
-            -   DATABASE_URL=postgresql://awais:Awais12345@postgres-prod:5432/proddb
+  postgres-prod:
+    container_name: postgres-prod
+    image: postgres:15
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U awais -d proddb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      - POSTGRES_USER=awais
+      - POSTGRES_PASSWORD=Awais12345
+      - POSTGRES_DB=proddb
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    networks:
+      - prod-network
 
-        depends_on:
-            postgres-prod:
-                condition:  service_healthy
-            
-            redis-prod:
-                condition:  service_started
-
-    postgres-prod:
-        image: postgres:15
-        container_name: postgres-prod
-        healthcheck:
-            test: ["CMD-SHELL", "pg_isready -U awais -d proddb"]
-            interval: 10s
-            timeout: 5s
-            retries: 5
-        environment:
-            -   POSTGRES_USER=awais
-            -   POSTGRES_PASSWORD=Awais12345
-            -   POSTGRES_DB=proddb
-        volumes:
-            -   postgres_prod_data:/var/lib/postgresql/data
-
-    redis-prod:
-        image: redis:7
-        volumes:
-            -   redis_prod_data:/data
+  redis-prod:
+    container_name: redis-prod
+    image: redis:7
+    command: redis-server --requirepass your_secure_password_here
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "your_secure_password_here", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - redis_prod_data:/data
+    networks:
+      - prod-network
+    ports:
+      - "6379:6379"
 
 volumes:
-    postgres_prod_data:
-    redis_prod_data:
+  postgres_prod_data:
+  redis_prod_data:
+
+networks:
+  prod-network:
+    driver: bridge
