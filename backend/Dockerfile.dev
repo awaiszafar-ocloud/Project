@@ -15,5 +15,7 @@ RUN npm install && npx prisma generate
 # Copy source code
 COPY . .
 
+EXPOSE 3000
+
 # Wait for Postgres + run migrations + start server
 CMD ["sh", "-c", "until PGPASSWORD=Awais12345 pg_isready -h postgres-dev -p 5432 -U awais -d devdb; do sleep 2; echo 'Waiting for Postgres...'; done && npx prisma migrate deploy && npm run dev"]

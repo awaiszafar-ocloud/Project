@@ -16,6 +16,7 @@ services:
     environment:
       - NODE_ENV=development
       - DATABASE_URL=postgresql://awais:Awais12345@postgres-dev:5432/devdb?sslmode=disable
+      - CHOKIDAR_USEPOLLING=true
     depends_on:
       postgres-dev:
         condition: service_healthy

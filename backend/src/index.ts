@@ -14,7 +14,11 @@ app.use(cors(corsOptions));
 
 
 app.get("/", (req, res) => {
-    return res.status(200).json({message: "Server is running"})
+    try {
+      return res.status(200).json({message: "Server is running"})
+    } catch (error) {
+      return res.status(400).json({message: "Server is down"})
+    }
 })
 
 app.get('/api', (req, res) => {
